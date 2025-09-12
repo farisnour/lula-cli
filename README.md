@@ -1,6 +1,6 @@
-# Lula - Better Pull Request Management
+# Lula - A CLI tool to manage pull requests from the terminal
 
-Lula is a CLI tool to help developers manage their Pull Requests.
+Lula is a CLI tool to help developers manage their pull requests from the terminal.
 
 ## Installation
 
@@ -10,13 +10,13 @@ pip install lula
 
 ## Usage
 
-List PR comments
-```bash
-lula comments
-```
-
 List your open pull-requests:
 
 ```bash
 lula list
+```
+
+List PR comments on the current checked-out branch
+```bash
+lula comments
 ```

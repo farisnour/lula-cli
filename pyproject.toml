@@ -1,7 +1,12 @@
 [project]
-name = "lula-pr-agent"
+name = "lula"
 version = "0.1.0"
-description = "A CLI tool to help developers manage their Pull Requests"
+description = "A CLI tool to manage pull requests from the terminal"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "click~=8.2.1",
+]
+
+[project.scripts]
+lula = "lula.cli:main"
