@@ -1,0 +1,16 @@
+# Git
+.git/
+
+# Virtual env
+.venv/
+
+# Claude related local files
+.claude/
+CLAUDE.md
+
+# Python cache files
+*.egg-info/
+__pycache__
+
+# Local todo.md file
+todo.md
