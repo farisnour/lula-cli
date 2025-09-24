@@ -22,15 +22,19 @@ def get_user_open_mrs() -> List[Dict[str, Any]]:
     """Fetch open merge requests for the current user."""
     try:
         gl = get_gitlab_client()
+        # Ensure authentication is performed so that gl.user is populated
+        gl.auth()
 
         # Get current user
         user = gl.user
+        if user is None:
+            raise click.ClickException("Unable to determine current user from GitLab. Please verify your token scopes.")
         user_id = user.id
 
         # Get open merge requests assigned to the user
         mrs = gl.mergerequests.list(
             state='opened',
-            assignee_id=user_id,
+            scope='assigned_to_me',
             per_page=50,
             order_by='updated_at',
             sort='desc'
@@ -39,16 +43,20 @@ def get_user_open_mrs() -> List[Dict[str, Any]]:
         # Convert to list of dictionaries for easier handling
         mr_list = []
         for mr in mrs:
+            attributes = getattr(mr, 'attributes', {}) or {}
+            author_name = (attributes.get('author') or {}).get('name')
+            project_id = attributes.get('project_id')
+
             mr_list.append({
-                'id': mr.iid,
-                'title': mr.title,
-                'source_branch': mr.source_branch,
-                'target_branch': mr.target_branch,
-                'web_url': mr.web_url,
-                'created_at': mr.created_at,
-                'updated_at': mr.updated_at,
-                'author': mr.author['name'],
-                'project': mr.project['name']
+                'id': getattr(mr, 'iid', None),
+                'title': getattr(mr, 'title', ''),
+                'source_branch': getattr(mr, 'source_branch', ''),
+                'target_branch': getattr(mr, 'target_branch', ''),
+                'web_url': getattr(mr, 'web_url', ''),
+                'created_at': getattr(mr, 'created_at', ''),
+                'updated_at': getattr(mr, 'updated_at', ''),
+                'author': author_name or '',
+                'project': f"project {project_id}" if project_id is not None else ''
             })
 
         return mr_list
