@@ -19,7 +19,7 @@ def get_gitlab_client() -> gitlab.Gitlab:
 
 
 def get_user_open_mrs() -> List[Dict[str, Any]]:
-    """Fetch open merge requests for the current user."""
+    """Fetch open merge requests assigned to or authored by the current user."""
     try:
         gl = get_gitlab_client()
         # Ensure authentication is performed so that gl.user is populated
@@ -31,14 +31,30 @@ def get_user_open_mrs() -> List[Dict[str, Any]]:
             raise click.ClickException("Unable to determine current user from GitLab. Please verify your token scopes.")
         user_id = user.id
 
-        # Get open merge requests assigned to the user
-        mrs = gl.mergerequests.list(
+        # Get open merge requests assigned to the user or authored by the user
+        assigned_mrs = gl.mergerequests.list(
             state='opened',
             scope='assigned_to_me',
             per_page=50,
             order_by='updated_at',
             sort='desc'
         )
+
+        authored_mrs = gl.mergerequests.list(
+            state='opened',
+            author_id=user_id,
+            per_page=50,
+            order_by='updated_at',
+            sort='desc'
+        )
+
+        # Combine and deduplicate MRs (in case user is both author and assignee)
+        mr_ids = set()
+        mrs = []
+        for mr in assigned_mrs + authored_mrs:
+            if mr.iid not in mr_ids:
+                mr_ids.add(mr.iid)
+                mrs.append(mr)
 
         # Convert to list of dictionaries for easier handling
         mr_list = []
