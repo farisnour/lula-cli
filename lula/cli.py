@@ -36,16 +36,14 @@ def get_user_open_mrs() -> List[Dict[str, Any]]:
             state='opened',
             scope='assigned_to_me',
             per_page=50,
-            order_by='updated_at',
-            sort='desc'
+            order_by='created_at',
         )
 
         authored_mrs = gl.mergerequests.list(
             state='opened',
             author_id=user_id,
             per_page=50,
-            order_by='updated_at',
-            sort='desc'
+            order_by='created_at',
         )
 
         # Combine and deduplicate MRs (in case user is both author and assignee)
@@ -55,6 +53,9 @@ def get_user_open_mrs() -> List[Dict[str, Any]]:
             if mr.iid not in mr_ids:
                 mr_ids.add(mr.iid)
                 mrs.append(mr)
+
+        # Sort by creation date (newest first)
+        mrs.sort(key=lambda mr: getattr(mr, 'created_at', ''), reverse=False)
 
         # Convert to list of dictionaries for easier handling
         mr_list = []
