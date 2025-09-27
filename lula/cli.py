@@ -18,6 +18,39 @@ def get_gitlab_client() -> gitlab.Gitlab:
     return gitlab.Gitlab(gitlab_url, private_token=gitlab_token)
 
 
+def get_project_name_from_mr(gl: gitlab.Gitlab, mr) -> str:
+    """Get project name from merge request object using multiple approaches."""
+    attributes = getattr(mr, 'attributes', {}) or {}
+
+    # Get project name - try multiple approaches
+    project_name = ''
+
+    # Try to get from attributes first
+    project_info = attributes.get('project', {}) or {}
+    if project_info:
+        project_name = project_info.get('name', '')
+
+    # If not found, try to get from the mr object directly
+    if not project_name and hasattr(mr, 'project'):
+        project_obj = getattr(mr, 'project', {})
+        if isinstance(project_obj, dict):
+            project_name = project_obj.get('name', '')
+        elif hasattr(project_obj, 'name'):
+            project_name = project_obj.name
+
+    # If still not found, try to get project info from GitLab API
+    if not project_name and hasattr(mr, 'project_id'):
+        try:
+            project_id = getattr(mr, 'project_id', None)
+            if project_id:
+                project = gl.projects.get(project_id)
+                project_name = project.name
+        except:
+            pass
+
+    return project_name
+
+
 def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
     """Fetch open merge requests assigned to or authored by the current user."""
     try:
@@ -37,6 +70,7 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
             scope='assigned_to_me',
             per_page=50,
             order_by='created_at',
+            with_labels_details=True,
         )
 
         authored_mrs = gl.mergerequests.list(
@@ -44,6 +78,7 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
             author_id=user_id,
             per_page=50,
             order_by='created_at',
+            with_labels_details=True,
         )
 
         # Combine and deduplicate MRs (in case user is both author and assignee)
@@ -62,7 +97,9 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
         for mr in mrs:
             attributes = getattr(mr, 'attributes', {}) or {}
             author_name = (attributes.get('author') or {}).get('name')
-            project_id = attributes.get('project_id')
+
+            # Get project name either from the merge request object or from the GitLab API
+            project_name = get_project_name_from_mr(gl, mr)
 
             mr_list.append({
                 'id': getattr(mr, 'iid', None),
@@ -73,7 +110,7 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
                 'created_at': getattr(mr, 'created_at', ''),
                 'updated_at': getattr(mr, 'updated_at', ''),
                 'author': author_name or '',
-                'project': f"project {project_id}" if project_id is not None else ''
+                'project': project_name or 'Unknown Project'
             })
 
         return mr_list
