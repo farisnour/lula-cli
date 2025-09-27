@@ -4,6 +4,9 @@
 # Virtual env
 .venv/
 
+# IDE files
+.vscode/
+
 # Claude related local files
 .claude/
 CLAUDE.md
