@@ -18,7 +18,7 @@ def get_gitlab_client() -> gitlab.Gitlab:
     return gitlab.Gitlab(gitlab_url, private_token=gitlab_token)
 
 
-def get_user_open_mrs() -> List[Dict[str, Any]]:
+def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
     """Fetch open merge requests assigned to or authored by the current user."""
     try:
         gl = get_gitlab_client()
@@ -54,8 +54,8 @@ def get_user_open_mrs() -> List[Dict[str, Any]]:
                 mr_ids.add(mr.iid)
                 mrs.append(mr)
 
-        # Sort by creation date (newest first)
-        mrs.sort(key=lambda mr: getattr(mr, 'created_at', ''), reverse=False)
+        # Sort by creation date
+        mrs.sort(key=lambda mr: getattr(mr, 'created_at', ''), reverse=desc)
 
         # Convert to list of dictionaries for easier handling
         mr_list = []
@@ -94,10 +94,11 @@ def cli():
 
 
 @cli.command()
-def list():
+@click.option('--desc', is_flag=True, help='Sort merge requests in descending order (newest first)')
+def list(desc):
     """List your open pull/merge requests"""
     try:
-        mrs = get_user_open_mrs()
+        mrs = get_user_open_mrs(desc=desc)
 
         if not mrs:
             click.echo("No open merge requests found.")
