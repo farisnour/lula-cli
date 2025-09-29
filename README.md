@@ -55,7 +55,7 @@ Since the project was installed in editable mode with `-e` local changes take ef
 
 ### Adding dependencies
 
-To add a new library as a dependency:
+To update or add a new library as a dependency:
 
 ```shell
 uv add "newlibrary~=1.2.3"
