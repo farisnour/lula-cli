@@ -3,7 +3,8 @@ import subprocess
 from typing import List, Dict, Any
 
 import click
-import gitlab
+from gitlab import Gitlab
+from gitlab.exceptions import GitlabAuthenticationError, GitlabGetError
 
 
 def get_gitlab_url_from_git() -> str:
@@ -43,7 +44,7 @@ def get_gitlab_url_from_git() -> str:
         return 'https://gitlab.com'
 
 
-def get_gitlab_client() -> gitlab.Gitlab:
+def get_gitlab_client() -> Gitlab:
     """Initialize and return a GitLab client."""
     gitlab_url = os.getenv('GITLAB_URL')
     if not gitlab_url:
@@ -53,14 +54,14 @@ def get_gitlab_client() -> gitlab.Gitlab:
 
     if not gitlab_token:
         raise click.ClickException(
-            "GitLab token not found. Please set the GITLAB_TOKEN environment variable.\n"
-            "You can get a token from: https://gitlab.com/-/profile/personal_access_tokens"
+            f"GitLab token not found. Please set the GITLAB_TOKEN environment variable.\n"
+            f"You can get a token from: {gitlab_url}/-/profile/personal_access_tokens"
         )
 
-    return gitlab.Gitlab(gitlab_url, private_token=gitlab_token)
+    return Gitlab(gitlab_url, private_token=gitlab_token)
 
 
-def get_project_name_from_mr(gl: gitlab.Gitlab, mr) -> str:
+def get_project_name_from_mr(gl: Gitlab, mr) -> str:
     """Get project name from merge request object using multiple approaches."""
     attributes = getattr(mr, 'attributes', {}) or {}
 
@@ -157,9 +158,9 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
 
         return mr_list
 
-    except gitlab.exceptions.GitlabAuthenticationError:
+    except GitlabAuthenticationError:
         raise click.ClickException("Authentication failed. Please check your GitLab token.")
-    except gitlab.exceptions.GitlabGetError as e:
+    except GitlabGetError as e:
         raise click.ClickException(f"Failed to fetch merge requests: {e}")
     except Exception as e:
         raise click.ClickException(f"Unexpected error: {e}")
