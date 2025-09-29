@@ -95,7 +95,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8,<9" },
-    { name = "python-gitlab", specifier = "~=6.3.0" },
+    { name = "python-gitlab", specifier = ">=6,<7" },
 ]
 
 [[package]]
