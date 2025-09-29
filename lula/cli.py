@@ -123,6 +123,19 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
         raise click.ClickException(f"Unexpected error: {e}")
 
 
+def get_projects_from_mrs(mrs: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    """Get projects from merge requests."""
+    projects = {}
+    for mr in mrs:
+        project_name = mr['project']
+        if project_name not in projects:
+            projects[project_name] = []
+        projects[project_name].append(mr)
+
+    # Sort projects alphabetically
+    return sorted(projects.items())
+
+
 @click.group()
 @click.version_option(version="0.1.0", prog_name="lula")
 def cli():
@@ -141,16 +154,21 @@ def list(desc):
             click.echo("No open merge requests found.")
             return
 
-        click.echo(f"Found {len(mrs)} open merge request(s):\n")
+        projects = get_projects_from_mrs(mrs)
 
-        for i, mr in enumerate(mrs, 1):
-            click.echo(f"{i}. {mr['title']}")
-            click.echo(f"   Project: {mr['project']}")
-            click.echo(f"   Branch: {mr['source_branch']} → {mr['target_branch']}")
-            click.echo(f"   Author: {mr['author']}")
-            click.echo(f"   Updated: {mr['updated_at']}")
-            click.echo(f"   URL: {mr['web_url']}")
-            click.echo()
+        mr_counter = 1
+        for project_name, project_mrs in projects:
+            click.echo(f"{project_name} ({len(project_mrs)} MR{'s' if len(project_mrs) != 1 else ''})")
+            click.echo("─" * (len(project_name) + 20))
+
+            for mr in project_mrs:
+                click.echo(f"{mr_counter}. {mr['title']}")
+                click.echo(f"   Branch: {mr['source_branch']} → {mr['target_branch']}")
+                click.echo(f"   Author: {mr['author']}")
+                click.echo(f"   Updated: {mr['updated_at']}")
+                click.echo(f"   URL: {mr['web_url']}")
+                click.echo()
+                mr_counter += 1
 
     except click.ClickException:
         raise
