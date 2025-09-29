@@ -162,6 +162,8 @@ def get_user_open_mrs(desc: bool = False) -> List[Dict[str, Any]]:
         raise click.ClickException("Authentication failed. Please check your GitLab token.")
     except GitlabGetError as e:
         raise click.ClickException(f"Failed to fetch merge requests: {e}")
+    except click.ClickException:
+        raise
     except Exception as e:
         raise click.ClickException(f"Unexpected error: {e}")
 
