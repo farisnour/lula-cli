@@ -5,7 +5,7 @@ description = "A CLI tool to manage pull requests from the terminal"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "click~=8.2.1",
+    "click>=8,<9",
     "python-gitlab~=6.3.0",
 ]
 
