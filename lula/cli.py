@@ -1,12 +1,54 @@
-import click
 import os
-import gitlab
+import subprocess
 from typing import List, Dict, Any
+
+import click
+import gitlab
+
+
+def get_gitlab_url_from_git() -> str:
+    """Extract GitLab URL from git remote origin configuration."""
+    try:
+        # Get the remote origin URL
+        result = subprocess.run(
+            ['git', 'config', '--get', 'remote.origin.url'],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        origin_url = result.stdout.strip()
+
+        # Check if this is a GitHub repository
+        if 'github.com' in origin_url:
+            raise click.ClickException("Github projects are not yet supported")
+
+        # Parse the URL to extract the GitLab instance URL
+        if origin_url.startswith('git@'):
+            # SSH format: git@gitlab.example.com:user/repo.git
+            # Extract the hostname part
+            host_part = origin_url.split('@')[1].split(':')[0]
+            return f"https://{host_part}"
+        elif origin_url.startswith('https://'):
+            # HTTPS format: https://gitlab.example.com/user/repo.git
+            # Extract the base URL
+            parts = origin_url.split('/')
+            if len(parts) >= 3:
+                return f"{parts[0]}//{parts[2]}"
+
+        # If we can't parse the URL, return the default
+        return 'https://gitlab.com'
+
+    except (subprocess.CalledProcessError, FileNotFoundError, IndexError):
+        # If git command fails or URL can't be parsed, return default
+        return 'https://gitlab.com'
 
 
 def get_gitlab_client() -> gitlab.Gitlab:
     """Initialize and return a GitLab client."""
-    gitlab_url = os.getenv('GITLAB_URL', 'https://gitlab.com')
+    gitlab_url = os.getenv('GITLAB_URL')
+    if not gitlab_url:
+        gitlab_url = get_gitlab_url_from_git()
+
     gitlab_token = os.getenv('GITLAB_TOKEN')
 
     if not gitlab_token:
