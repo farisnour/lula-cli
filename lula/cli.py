@@ -58,7 +58,7 @@ def get_gitlab_client() -> Gitlab:
             f"You can get a token from: {gitlab_url}/-/profile/personal_access_tokens"
         )
 
-    return Gitlab(gitlab_url, private_token=gitlab_token)
+    return Gitlab(gitlab_url, private_token=gitlab_token, timeout=3.0)
 
 
 def get_project_name_from_mr(gl: Gitlab, mr) -> str:
