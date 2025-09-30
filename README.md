@@ -1,6 +1,6 @@
 # Lula - A CLI tool to manage pull requests from the terminal
 
-Lula is a CLI tool to manage pull requests from the terminal. It currently only supports Gitlab projects.
+Lula is a CLI tool to manage pull requests in git repositories from the terminal. It currently only supports Gitlab repositories.
 
 ## Installation
 
