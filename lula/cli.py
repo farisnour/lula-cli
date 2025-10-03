@@ -177,8 +177,12 @@ def get_projects_from_mrs(mrs: List[Dict[str, Any]]) -> Dict[str, List[Dict[str,
             projects[project_name] = []
         projects[project_name].append(mr)
 
-    # Sort projects alphabetically
-    return sorted(projects.items())
+    # Sort projects by most recent MR creation date (descending)
+    return sorted(
+        projects.items(),
+        key=lambda item: max(mr['created_at'] for mr in item[1]),
+        reverse=True,
+    )
 
 
 @click.group()
