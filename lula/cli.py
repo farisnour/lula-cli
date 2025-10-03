@@ -211,10 +211,13 @@ def list(asc):
             click.echo("─" * (len(project_name) + 20))
 
             for mr in project_mrs:
+                # List only the date (first 10 chars) from the timestamp string
+                updated_at = mr['updated_at'][:10]
+
                 click.echo(f"{mr_counter}. {mr['title']}")
                 click.echo(f"   Branch: {mr['source_branch']} → {mr['target_branch']}")
                 click.echo(f"   Author: {mr['author']}")
-                click.echo(f"   Updated: {mr['updated_at']}")
+                click.echo(f"   Updated: {updated_at}")
                 click.echo(f"   URL: {mr['web_url']}")
                 click.echo()
                 mr_counter += 1
