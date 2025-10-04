@@ -14,3 +14,8 @@ lula = "lula.cli:main"
 
 [tool.uv]
 package = true
+
+[dependency-groups]
+dev = [
+    "ruff>=0.13.3",
+]
