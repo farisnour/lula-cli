@@ -13,8 +13,10 @@ CLAUDE.md
 
 # Python cache files
 *.egg-info/
+src/*.egg-info/
 __pycache__
 build/
+dist/
 
 # Local todo.md file
 todo.md
