@@ -2,11 +2,13 @@
 
 Lula is a CLI tool to manage pull requests in git repositories from the terminal. It currently only supports Gitlab repositories.
 
+<!--
 ## Installation
 
 ```bash
 pip install lula
 ```
+-->
 
 ## Usage
 
