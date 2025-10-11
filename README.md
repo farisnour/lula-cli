@@ -1,5 +1,3 @@
-# Lula - A CLI tool to manage pull requests from the terminal
-
 Lula is a CLI tool to manage pull requests in git repositories from the terminal. It currently only supports Gitlab repositories.
 
 <!--
@@ -50,7 +48,7 @@ Install the local project and its dependencies into a local virtual environment:
 ```shell
 uv pip install -e . && source .venv/bin/activate
 
-lula --help
+lula --version
 ```
 
 Since the project was installed in editable mode with `-e` local changes take effect right away.
