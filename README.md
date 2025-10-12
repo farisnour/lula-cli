@@ -46,7 +46,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Install the local project and its dependencies into a local virtual environment:
 
 ```shell
-uv pip install -e . && source .venv/bin/activate
+uv venv && uv pip install -e . && source .venv/bin/activate
 
 lula --version
 ```
