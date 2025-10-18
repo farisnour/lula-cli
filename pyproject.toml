@@ -3,6 +3,9 @@ name = "lula"
 version = "0.1.0"
 description = "A CLI tool to manage pull requests from the terminal"
 readme = "README.md"
+authors = [
+    { name = "Faris Nour", email = "farisnour93@gmail.com" }
+]
 requires-python = ">=3.12"
 dependencies = [
     "click>=8,<9",
@@ -19,3 +22,7 @@ package = true
 dev = [
     "ruff>=0.13.3",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
