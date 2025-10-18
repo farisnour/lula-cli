@@ -18,5 +18,8 @@ __pycache__
 build/
 dist/
 
+# Ruff cache folder
+.ruff_cache
+
 # Local todo.md file
 todo.md
