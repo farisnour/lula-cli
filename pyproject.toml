@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Faris Nour", email = "farisnour93@gmail.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "click>=8,<9",
     "python-gitlab>=6,<7",
