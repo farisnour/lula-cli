@@ -1,4 +1,4 @@
-Lula is a CLI tool to manage pull requests in git repositories from the terminal. It currently only supports Gitlab repositories.
+Lula is a CLI tool to manage pull requests in git repositories from the terminal. It currently supports Gitlab repositories, including self-hosted instances.
 
 <!--
 ## Installation
@@ -25,12 +25,6 @@ Before using lula, you need to set up your GitLab token:
 
 ```bash
 export GITLAB_TOKEN="your_token_here"
-```
-
-For self-hosted GitLab instances, also set the GitLab URL:
-
-```bash
-export GITLAB_URL="https://your-gitlab-instance.com"
 ```
 
 ## Development
