@@ -1,5 +1,6 @@
 import os
 import subprocess
+from datetime import datetime, timedelta, UTC
 from typing import List, Dict, Any
 
 import click
@@ -221,8 +222,26 @@ def list(asc):
             click.echo("─" * (len(project_name) + 20))
 
             for mr in project_mrs:
-                # List only the date (first 10 chars) from the timestamp string
-                updated_at = mr["updated_at"][:10]
+                # List the date listing using "X minutes/hours/days/months ago"
+                now = datetime.now(UTC)
+                time_diff = now - datetime.fromisoformat(mr["updated_at"])
+                total_seconds = time_diff.total_seconds()
+                updated_at = None
+
+                if time_diff < timedelta(0):
+                    raise click.ClickException(
+                        f"Error in MR updated_at {updated_at} date is invalid."
+                    )
+                elif time_diff < timedelta(hours=1):
+                    updated_at = f"{int(total_seconds // 60)} minute(s) ago"
+                elif time_diff < timedelta(days=1):
+                    updated_at = f"{int(total_seconds / 60 // 60)} hour(s) ago"
+                elif time_diff < timedelta(days=40):
+                    updated_at = f"{int(total_seconds / 60 / 60 // 24)} day(s) ago"
+                else:
+                    updated_at = (
+                        f"{int(total_seconds / 60 / 60 / 24 // 30)} month(s) ago"
+                    )
 
                 click.echo(f"{mr_counter}. {mr['title']}")
                 click.echo(f"   Branch: {mr['source_branch']} → {mr['target_branch']}")
