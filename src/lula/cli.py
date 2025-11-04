@@ -193,13 +193,18 @@ def get_projects_from_mrs(mrs: List[Dict[str, Any]]) -> Dict[str, List[Dict[str,
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="lula")
 def cli():
     """Lula - A CLI tool to manage pull requests from the terminal"""
     pass
 
 
-@cli.command()
+@cli.group()
+def mr():
+    """MR subcommands"""
+    pass
+
+
+@mr.command()
 @click.option(
     "--asc", is_flag=True, help="Sort merge requests in ascending order (oldest first)"
 )
@@ -258,16 +263,13 @@ def list(asc):
         raise click.Abort()
 
 
-@cli.command()
+@mr.command()
 def comments():
     """List PR comments"""
     click.echo("Listing PR comments...")
-    click.echo("No comments found (not yet implemented)")
+    click.echo("not yet implemented")
 
 
 def main():
+    cli.add_command(list)
     cli()
-
-
-if __name__ == "__main__":
-    main()
